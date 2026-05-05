@@ -14,20 +14,10 @@ HTML = '''
 <div id="chat" style="height:400px;overflow-y:auto;border:1px solid #333;padding:10px;margin-bottom:10px"></div>
 <input id="msg" placeholder="Type your message..." style="width:70%;padding:10px;background:#222;color:#fff;border:1px solid #444"/>
 <button onclick="send()" style="padding:10px;background:#6200ea;color:#fff;border:none;cursor:pointer">Send</button>
-<button onclick="startVoice()" style="padding:10px;background:#00c853;color:#fff;border:none;cursor:pointer">🎤 Speak</button>
 <script>
 let history=[];
-let voices=[];
 window.speechSynthesis.onvoiceschanged=function(){voices=window.speechSynthesis.getVoices();};
 
-function speak(text){
-  let utter=new SpeechSynthesisUtterance(text);
-  let voice=voices.find(v=>v.name.includes("Google")||v.name.includes("Male"))||voices[0];
-  if(voice)utter.voice=voice;
-  utter.rate=0.9;
-  utter.pitch=0.9;
-  window.speechSynthesis.speak(utter);
-}
 
 async function send(msg){
   msg=msg||document.getElementById("msg").value;
@@ -40,10 +30,8 @@ async function send(msg){
   history.push({role:"assistant",content:data.reply});
   document.getElementById("chat").innerHTML+="<div style='color:#6200ea'>Fezmoh: "+data.reply+"</div>";
   document.getElementById("chat").scrollTop=document.getElementById("chat").scrollHeight;
-  speak(data.reply);
 }
 
-function startVoice(){
   let recognition=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
   recognition.lang="en-US";
   recognition.start();
