@@ -33,25 +33,62 @@ def load_history():
 HTML = '''
 <!DOCTYPE html>
 <html>
-<head><title>Fezmoh AI</title></head>
-<body style="background:#111;color:#fff;font-family:Arial;max-width:800px;margin:auto;padding:20px">
-<h1>🤖 Fezmoh AI</h1>
-<div id="chat" style="height:400px;overflow-y:auto;border:1px solid #333;padding:10px;margin-bottom:10px"></div>
-<input id="msg" placeholder="Type your message..." style="width:70%;padding:10px;background:#222;color:#fff;border:1px solid #444"/>
-<button onclick="send()" style="padding:10px;background:#6200ea;color:#fff;border:none;cursor:pointer">Send</button>
+<head>
+<title>Fezmoh AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a0a;color:#fff;font-family:Arial;display:flex;flex-direction:column;height:100vh}
+#header{background:#1a1a2e;padding:15px;text-align:center;border-bottom:2px solid #6200ea}
+#header h1{color:#6200ea;font-size:22px}
+#header p{color:#aaa;font-size:11px}
+#chat{flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:12px}
+.msg-user{background:#6200ea;padding:10px 15px;border-radius:18px 18px 4px 18px;max-width:78%;align-self:flex-end;font-size:14px}
+.msg-bot{background:#1e1e1e;padding:10px 15px;border-radius:18px 18px 18px 4px;max-width:78%;align-self:flex-start;border:1px solid #333;font-size:14px}
+.bot-label{color:#6200ea;font-weight:bold;font-size:11px;margin-bottom:4px}
+#footer{background:#1a1a2e;padding:12px;display:flex;gap:8px;border-top:2px solid #6200ea;align-items:center}
+#msg{flex:1;padding:12px 16px;background:#0d0d0d;color:#fff;border:1px solid #6200ea;border-radius:25px;outline:none;font-size:14px}
+#send{padding:12px 20px;background:#6200ea;color:#fff;border:none;border-radius:25px;cursor:pointer;font-size:14px;font-weight:bold}
+#send:hover{background:#7c00ff}
+#clear{padding:10px 12px;background:#222;color:#aaa;border:1px solid #333;border-radius:25px;cursor:pointer;font-size:16px}
+#clear:hover{background:#333}
+.typing{color:#aaa;font-size:13px;font-style:italic}
+</style>
+</head>
+<body>
+<div id="header">
+  <h1>🤖 Fezmoh AI</h1>
+  <p>Your intelligent assistant • Always here for you</p>
+</div>
+<div id="chat">
+  <div class="msg-bot"><div class="bot-label">Fezmoh</div>Hey! I am Fezmoh, your AI assistant. How can I help you today? 😊</div>
+</div>
+<div id="footer">
+  <input id="msg" placeholder="Message Fezmoh..."/>
+  <button id="clear" onclick="clearChat()" title="Clear chat">🗑</button>
+  <button id="send" onclick="send()">Send</button>
+</div>
 <script>
 let history=[];
 async function send(){
-  let msg=document.getElementById("msg").value;
+  let msg=document.getElementById("msg").value.trim();
   if(!msg)return;
-  document.getElementById("chat").innerHTML+="<div style='color:#aaa'>You: "+msg+"</div>";
+  let chat=document.getElementById("chat");
+  chat.innerHTML+="<div class='msg-user'>"+msg+"</div>";
   document.getElementById("msg").value="";
+  chat.innerHTML+="<div class='msg-bot typing' id='typing'><div class='bot-label'>Fezmoh</div>typing...</div>";
+  chat.scrollTop=chat.scrollHeight;
   history.push({role:"user",content:msg});
   let res=await fetch("/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({history,message:msg})});
   let data=await res.json();
   history.push({role:"assistant",content:data.reply});
-  document.getElementById("chat").innerHTML+="<div style='color:#6200ea'>Fezmoh: "+data.reply+"</div>";
-  document.getElementById("chat").scrollTop=document.getElementById("chat").scrollHeight;
+  document.getElementById("typing").remove();
+  chat.innerHTML+="<div class='msg-bot'><div class='bot-label'>Fezmoh</div>"+data.reply+"</div>";
+  chat.scrollTop=chat.scrollHeight;
+}
+function clearChat(){
+  document.getElementById("chat").innerHTML="<div class='msg-bot'><div class='bot-label'>Fezmoh</div>Hey! I am Fezmoh, your AI assistant. How can I help you today? 😊</div>";
+  history=[];
 }
 document.getElementById("msg").addEventListener("keypress",function(e){if(e.key=="Enter")send();});
 </script>
@@ -72,7 +109,7 @@ def chat():
     history.append({"role": "user", "content": message})
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
-        messages=[{"role": "system", "content": "You are Fezmoh, an incredible AI assistant. You are friendly, funny, smart, motivating and professional. Your creator is Austine Baraka but only mention this if someone asks. Do not bring it up randomly."}] + history
+        messages=[{"role": "system", "content": "You are Fezmoh, an incredible AI assistant. You are friendly, funny, smart, motivating and professional. Your creator is Austine Baraka but only mention this if someone asks."}] + history
     )
     reply = response.choices[0].message.content
     save_message("assistant", reply)
