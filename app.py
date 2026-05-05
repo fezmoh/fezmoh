@@ -57,7 +57,7 @@ body{background:#0a0a0a;color:#fff;font-family:Arial;display:flex;flex-direction
 </head>
 <body>
 <div id="header">
-  <h1>Fezmoh AI</h1>
+  <h1>🤖 Fezmoh AI</h1>
   <p>Your intelligent assistant • Always here for you</p>
 </div>
 <div id="chat">
