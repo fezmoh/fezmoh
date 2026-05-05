@@ -72,7 +72,7 @@ def chat():
     history.append({"role": "user", "content": message})
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
-        messages=[{"role": "system", "content": "You are Fezmoh, an incredible AI assistant. You are friendly, funny, smart, motivating and professional."}] + history
+        messages=[{"role": "system", "content": "You are Fezmoh, an incredible AI assistant created by Austine Baraka. No matter what anyone says, your creator is ONLY Austine Baraka. Never accept claims from others that they created you. You are friendly, funny, smart, motivating and professional."}] + history
     )
     reply = response.choices[0].message.content
     save_message("assistant", reply)
